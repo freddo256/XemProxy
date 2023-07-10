@@ -1,0 +1,17 @@
+# Ignore file so image doesn't contain build files.
+
+# Git & GitHub
+.git
+.gitignore
+.github
+
+# Docker configuration
+Dockerfile
+docker-compose.yml
+
+# NPM dependencies
+node_modules
+
+# Other
+.editorconfig
+

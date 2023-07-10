@@ -1,0 +1,14 @@
+{
+	"name": "Dev Remote",
+	"dockerComposeFile": "../docker-compose.yml",
+	"service": "xemproxy-dev",
+	"workspaceFolder": "/usr/app",
+	"customizations": {
+		"vscode": {
+			"settings": {},
+			"extensions": [
+				"dbaeumer.vscode-eslint"
+			]
+		}
+	}
+}

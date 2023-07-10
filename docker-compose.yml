@@ -1,0 +1,45 @@
+version: "3.5"
+services:
+  xemproxy-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: xemproxy:dev
+    stdin_open: true
+    tty: true
+    networks:
+      - xemproxy.net
+    container_name: "xemproxy"
+    restart: always
+    ports:
+      # Exposed ports for web traffic.
+      - "8111:8111"
+    volumes:
+      - .:/usr/app
+      # Make sure that node_modules not influenced by that of the host
+      # system, by mapping to a container volume, which is persisted
+      # between container executions.
+      - reserved:/usr/app/node_modules/
+  xemproxy-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    image: xemproxy:prod
+    stdin_open: true
+    tty: true
+    networks:
+      - xemproxy.net
+    container_name: "xemproxy"
+    restart: always
+    ports:
+      # Exposed ports for web traffic.
+      - "8080:8080"
+
+# Named Volumes
+volumes:
+  reserved:
+# Networks
+networks:
+  xemproxy.net:
+    name: xemproxy.net
+    driver: "bridge"

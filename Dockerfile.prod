@@ -1,0 +1,34 @@
+ARG ARCH=amd64
+ARG NODE_VERSION=18
+ARG OS=buster-slim
+
+# Docker file to create a build image for NodeJS application.
+FROM ${ARCH}/node:${NODE_VERSION}-${OS} as Build
+
+# Copy source files.
+WORKDIR /usr/app
+COPY . .
+
+# Install dependencies.
+RUN apt-get update -y && apt-get -y upgrade
+
+# Build
+RUN npm i && npm run package
+
+# Docker file to create a final image for NodeJS application.
+FROM ${ARCH}/node:${NODE_VERSION}-${OS}
+RUN apt-get update -y && apt-get -y upgrade
+
+# Copy built files.
+WORKDIR /usr/app
+COPY --from=Build /usr/app/dist/ ./
+COPY ./package*.json .
+
+# Install production dependencies.
+RUN npm ci --omit=dev
+
+# Host on 8080
+EXPOSE 8080
+
+# Run the server.
+CMD ["node", "./express.bundle.js"]

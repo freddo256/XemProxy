@@ -1,0 +1,23 @@
+ARG ARCH=amd64
+ARG NODE_VERSION=18
+ARG OS=buster-slim
+
+# Docker file to create an image for NodeJS application.
+FROM ${ARCH}/node:${NODE_VERSION}-${OS}
+
+# Persisted volume to map to disk folder
+VOLUME /usr/app
+WORKDIR /usr/app
+
+# Install dependencies.
+RUN apt-get update -y && apt-get -y upgrade && apt-get -y install git
+
+# Expose any ports.
+EXPOSE 8080
+
+# Execute build on startup.
+RUN echo "cd /usr/app && npm i && npm run build" >> ~/.bashrc
+RUN echo "echo \"Start server with 'npm start'\"" >> ~/.bashrc
+
+# Execute Shell
+ENTRYPOINT ["/bin/bash"]
