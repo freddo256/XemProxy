@@ -9,19 +9,21 @@ import versions from "./version.js";
 // eslint-disable-next-line no-underscore-dangle
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const port = 8111;
+// eslint-disable-next-line no-process-env
+const port = process.env.PORT || 8111;
 const expressApp = express();
 
 // Middleware setup.
 expressApp.use(compression());
 expressApp.use(express.json());
+expressApp.use(express.urlencoded({ extended: false }));
 expressApp.use(nocache());
 
 // Serve static files from the dist folder.
 expressApp.use(express.static(__dirname));
 
 // Handlers.
-expressApp.get("/", app);
+expressApp.all("*", app);
 
 expressApp.listen(port, err => {
     console.log(`XemProxy version ${versions.GLOBAL_VERSION}`);
