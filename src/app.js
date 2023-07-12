@@ -16,11 +16,12 @@ const haveMap = (body, yaml) => {
         // eslint-disable-next-line prefer-reflect
         delete body.data[key];
     });
-    const includeEntries = Object.entries(yaml.include || []);
+    const includeEntries = Object.values(yaml.include || []);
     console.log(`Include entries: ${includeEntries.length}`);
     // eslint-disable-next-line array-element-newline
-    includeEntries.forEach(([key, value]) => {
-        console.debug(JSON.stringify(value));
+    includeEntries.forEach(entry => {
+        const key = Object.keys(entry)[0];
+        console.info(`Processing entry with TVDBID ${key}`);
         if (!(key in body.data)) {
             body.data.push(key);
         }

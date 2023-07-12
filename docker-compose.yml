@@ -33,7 +33,7 @@ services:
     restart: always
     ports:
       # Exposed ports for web traffic.
-      - "8080:8080"
+      - "8111:8111"
 
 # Named Volumes
 volumes:
