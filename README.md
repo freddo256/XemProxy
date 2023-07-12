@@ -20,18 +20,22 @@ This directory has been created in the image to be used for configuration and pe
 ### config.yml
 This file contains the custom mapping that will be merged with the original response  
 ```yaml
+---
 exclude:
-# TVDB-ID
-- '72241'
+  - "70668"
 include:
-  '326732':
-  - Ze Tian Ji: -1
-  'Tvdb-ID':
-  - Example All Seasons Title 1: -1
-  - Example All Seasons Title 2: -1
-  - Example Season 1 Title: 1
-  - Example Season 2 Title: 2
-  - Example Season 3 Title: 3
+  - "77715":
+      scene:
+        absolute: 2
+        season: 54
+        episode: 2
+      tvdb:
+        absolute: 1
+        season: 52
+        episode: 1
+      range: 300
+      names:
+        - Emmerdale: 52
 
 ```
 
