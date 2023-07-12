@@ -1,3 +1,6 @@
+/* eslint-disable line-comment-position */
+/* eslint-disable no-inline-comments */
+/* eslint-disable capitalized-comments */
 /* eslint-disable array-element-newline */
 import YAML from "yaml";
 import fs from "fs";
@@ -34,8 +37,8 @@ const insertMappings = (m, data, range) => {
         for (let j = 0; j < data.length; j += 1) {
             const dest = data[j].tvdb;
             if (dest.season === mapping.tvdb.season &&
-                dest.episode === mapping.tvdb.episode &&
-                dest.absolute === mapping.tvdb.absolute) {
+                dest.episode === mapping.tvdb.episode // &&
+                /* dest.absolute === mapping.tvdb.absolute */) {
                 return dest;
             }
         }
@@ -45,12 +48,12 @@ const insertMappings = (m, data, range) => {
         const increment = i - 1;
         const newMapping = {
             "scene": {
-                absolute: lodash.toInteger(m.scene.absolute) + increment,
+                // absolute: lodash.toInteger(m.scene.absolute) + increment,
                 season: m.scene.season,
                 episode: lodash.toInteger(m.scene.episode) + increment
             },
             "tvdb": {
-                absolute: lodash.toInteger(m.tvdb.absolute) + increment,
+                // absolute: lodash.toInteger(m.tvdb.absolute) + increment,
                 season: m.tvdb.season,
                 episode: lodash.toInteger(m.tvdb.episode) + increment
             }
