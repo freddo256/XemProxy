@@ -28,23 +28,94 @@ const haveMap = (body, yaml) => {
     return body;
 };
 
+const insertMappings = (m, data, range) => {
+    const findMapping = mapping => {
+        for (let j = 0; j < data.length; j += 1) {
+            const dest = data[j].tvdb;
+            if (dest.season === mapping.tvdb.season &&
+                dest.episode === mapping.tvdb.episode &&
+                dest.absolute === mapping.tvdb.absolute) {
+                return dest;
+            }
+        }
+        return null;
+    };
+    for (let i = 1; i <= range; i += 1) {
+        const increment = i - 1;
+        const newMapping = {
+            "scene": {
+                absolute: lodash.toInteger(m.scene.absolute) + increment,
+                season: m.scene.season,
+                episode: lodash.toInteger(m.scene.episode) + increment
+            },
+            "tvdb": {
+                absolute: lodash.toInteger(m.tvdb.absolute) + increment,
+                season: m.tvdb.season,
+                episode: lodash.toInteger(m.tvdb.episode) + increment
+            }
+        };
+        if (!findMapping(newMapping)) {
+            data.push(newMapping);
+        }
+    }
+};
+
 const all = (body, yaml, tvdbid) => {
+    const excludeEntries = yaml.exclude || [];
+    console.log(`Exclude entries: ${excludeEntries.length}`);
+    excludeEntries.forEach(key => {
+        // eslint-disable-next-line prefer-reflect
+        delete body.data[key];
+    });
     const includeEntries = Object.values(yaml.include || []);
     console.info(`Include entries: ${includeEntries.length}`);
     includeEntries.forEach(entry => {
         const key = Object.keys(entry)[0];
+        console.info(`Processing entry with TVDBID ${key}`);
         if (key === tvdbid) {
             const value = Object.values(entry)[0];
-            if (lodash.hasIn(value, ["scene", "tvdb"])) {
-                console.debug(entry);
+            if (lodash.has(value, "scene") && lodash.has(value, "tvdb")) {
+                // Support ranges.
+                if (lodash.has(value, "range") && lodash.isInteger(value.range)) {
+                    const max = lodash.toInteger(value.range);
+                    insertMappings(value, body.data, max);
+                } else {
+                    insertMappings(value, body.data, 1);
+                }
+            }
+        }
+    });
+    if (includeEntries.length > 0 &&
+        body.result === "failure" &&
+        body.message === `no show with the tvdb_id ${tvdbid} found`) {
+        body.result = "success";
+        body.message = `full mapping for ${tvdbid} on tvdb.`;
+    }
+    return body;
+};
+
+const allNames = (body, yaml, seasonNumbers = false) => {
+    const excludeEntries = yaml.exclude || [];
+    console.log(`Exclude entries: ${excludeEntries.length}`);
+    excludeEntries.forEach(key => {
+        // eslint-disable-next-line prefer-reflect
+        delete body.data[key];
+    });
+    const includeEntries = Object.values(yaml.include || []);
+    console.log(`Include entries: ${includeEntries.length}`);
+    includeEntries.forEach(entry => {
+        const key = Object.keys(entry)[0];
+        const value = Object.values(entry)[0];
+        console.info(`Processing entry with TVDBID ${key}`);
+        if (lodash.has(value, "names")) {
+            if (seasonNumbers) {
+                body.data[key] = value.names;
+            } else {
+                body.data[key] = value.names.map(el => Object.keys(el)[0]);
             }
         }
     });
     return body;
-};
-
-const allNames = (body, yaml) => {
-    throw new Error("Not implemented");
 };
 
 const processError = (err, res) => {
@@ -60,8 +131,9 @@ export default (req, res) => {
     // Process the request.
     console.info(`Request received for ${req.originalUrl}`);
     try {
+        // TheXem.info seems to care about case of query string parameters.
         const url = req.url.toLowerCase();
-        Request.get(url).then(response => {
+        Request.get(req.url).then(response => {
             res.set("Content-Type", "application/json");
             const body = response.body;
             const rawData = fs.readFileSync(path.join(__dirname, "config.yml"), "utf-8");
@@ -71,7 +143,7 @@ export default (req, res) => {
                 res.send(haveMap(body, yaml));
             } else if (req.query.origin && response.type === "application/json" && url.startsWith("/map/allnames")) {
                 console.log("Getting alternate names");
-                res.send(allNames(body, yaml));
+                res.send(allNames(body, yaml, req.query.seasonNumbers));
             } else if (req.query.origin && response.type === "application/json" && url.startsWith("/map/all") && req.query.id) {
                 console.log(`Getting TVDB mappings for TVDBID ${req.query.id}`);
                 res.send(all(body, yaml, req.query.id));

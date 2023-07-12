@@ -16,7 +16,8 @@ export default class Request {
             const fwdUrl = `https://${this.headerHost}${url}`;
             axios.get(fwdUrl, options).then(response => {
                 if (response.data) {
-                    console.log(`AXIOS response: ${JSON.stringify(response.data)}`);
+                    // eslint-disable-next-line capitalized-comments
+                    // console.log(`AXIOS response: ${JSON.stringify(response.data)}`);
                     resolve({
                         type: response.headers["content-type"],
                         body: response.data
