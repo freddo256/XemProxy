@@ -4,13 +4,13 @@ exclude:
 include:
   - "77715":
       scene:
-        absolute: 2
-        season: 54
-        episode: 2
+        absolute: 1
+        season: 2024
+        episode: 1
       tvdb:
         absolute: 1
-        season: 52
+        season: 53
         episode: 1
       range: 300
       names:
-        - Emmerdale: 52
+        - Emmerdale: 53
